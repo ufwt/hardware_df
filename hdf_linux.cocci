@@ -21,7 +21,7 @@ def print_and_log(filename,first,second,count):
 
 //---------------------
 @ rule1 disable drop_cast exists @
-expression addr,exp1,exp2,src,size1,size2,offset;
+expression addr,exp1,exp2,src,size1,size2,offset,value;
 position p1,p2;
 identifier func;
 type T1,T2;
@@ -44,6 +44,14 @@ type T1,T2;
 	readl(src)@p1
 |
 	readq(src)@p1
+|
+	__raw_readb(src)@p1
+|	
+	__raw_readw(src)@p1
+|
+	__raw_readl(src)@p1
+|
+	__raw_readq(src)@p1
 )
 
 	...	when any
@@ -54,6 +62,18 @@ type T1,T2;
 		when != src = src - offset
 		when != src--
 		when != src = addr
+		when != iowrite8(value,src)
+		when != iowrite16(value,src)
+		when != iowrite32(value,src)
+		when != iowrite64(value,src)
+		when != writeb(value,src)
+		when != writew(value,src)
+		when != writel(value,src)
+		when != writeq(value,src)
+		when != __raw_writeb(value,src)
+		when != __raw_writew(value,src)
+		when != __raw_writel(value,src)
+		when != __raw_writeq(value,src)
 		
 (
 	ioread8(src)@p2
@@ -71,6 +91,14 @@ type T1,T2;
 	readl(src)@p2
 |
 	readq(src)@p2
+|
+	__raw_readb(src)@p2
+|	
+	__raw_readw(src)@p2
+|
+	__raw_readl(src)@p2
+|
+	__raw_readq(src)@p2
 )	
 	...
 	}
@@ -94,7 +122,8 @@ if p11 and p12:
 		count = str(int(count) + 1)
 	else:
 		count = "1"
-	print_and_log(filename, first, second, count)
+	if first != second:
+		print_and_log(filename, first, second, count)
 	#ret = post_match_process(p11, p12, s1, s1, count)
 	#if ret: 
 		#count = ret
