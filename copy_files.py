@@ -4,8 +4,8 @@ import shutil
 
 class Tool:
 	def __init__(self ):
-		if not os.path.exists("outcome/"):
-			os.mkdir('outcome/')
+		if not os.path.exists("stage1_basic/"):
+			os.mkdir('stage1_basic/')
 			#os.path.isfile('test.txt') 
 
 		self.result_handler = open("result.txt","r")
@@ -19,7 +19,7 @@ class Tool:
 	def get_dst(self, src):
 		p = src.rfind('/')
 		filename = src[p+1:]
-		return 'outcome/'+str(self.counter)+"-"+filename
+		return 'stage1_basic/'+str(self.counter)+"-"+filename
 
 	def tailor(self, str): #delete '\n'
 		s = len(str)
