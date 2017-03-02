@@ -1,0 +1,1 @@
+spatch --sp-file  basic.cocci -D count=0 test2.c

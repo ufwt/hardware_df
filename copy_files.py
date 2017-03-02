@@ -1,11 +1,11 @@
 import os
 import os.path
 import shutil
-
+import json
 class Tool:
 	def __init__(self ):
-		if not os.path.exists("stage1_basic/"):
-			os.mkdir('stage1_basic/')
+		if not os.path.exists("stage1_identify/"):
+			os.mkdir('stage1_identify/')
 			#os.path.isfile('test.txt') 
 
 		self.result_handler = open("result.txt","r")
@@ -19,31 +19,27 @@ class Tool:
 	def get_dst(self, src):
 		p = src.rfind('/')
 		filename = src[p+1:]
-		return 'stage1_basic/'+str(self.counter)+"-"+filename
+		return 'stage1_identify/'+str(self.counter)+'---'+filename
 
-	def tailor(self, str): #delete '\n'
-		s = len(str)
-		return str[:s-1]
 		
 	def main(self):
 		
 		while True:
-			src = self.result_handler.readline()
-			if not src:
+			line_str = self.result_handler.readline()
+			if not line_str:
 				print "Finished copying."
 				break
 			else:
-				if src[0] != 'N' and src[0] != '-' :
-					if src != self.buffer :
-						self.counter = self.counter + 1
-						dst = self.get_dst(src)
-						s = self.tailor(src)
-						d = self.tailor(dst)
-						print "Copying from: ", s, "\tto: ", d
-						shutil.copy(s,d) 
-						#shutil.move('d:/c.png','e:/')
-						#shutil.rmtree('d:/dd')
-						self.buffer = src
+				
+				line = line_str[:len(line_str)-1] #cut \n
+				data = json.loads(line) #switch to python dict
+				src = data['fileName']
+				if src != self.buffer: #skip copying the same file
+					self.buffer = src
+					self.counter = self.counter + 1
+					dst = self.get_dst(src)
+					print "Copying from: ", src, "\tto: ", dst
+					shutil.copy(src,dst) 
 					
 					
 	def finish(self):
