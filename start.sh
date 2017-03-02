@@ -2,7 +2,8 @@
 
 #=========================================Initialization
 rootdir=$(pwd)
-resultfile='result.txt'
+resultfile1='record1.txt'
+resultfile2='record2.txt'
 testdir='testdir'
 outdir1='stage1_identify'
 outdir2='stage2_switch'
@@ -49,13 +50,23 @@ function init(){
 		echo Make  testdir.
 	fi
 
-	if test -f ${resultfile}
+	if test -f ${resultfile1}
 	then 
-		rm ${resultfile}
-		touch ${resultfile}
+		rm ${resultfile1}
+		touch ${resultfile1}
 		echo Remove old results...
 	else
-		touch ${resultfile}
+		touch ${resultfile1}
+		echo Make results log file...
+	fi
+
+	if test -f ${resultfile2}
+	then 
+		rm ${resultfile2}
+		touch ${resultfile2}
+		echo Remove old results...
+	else
+		touch ${resultfile2}
 		echo Make results log file...
 	fi
 }
@@ -102,7 +113,7 @@ function switch_wrapper() {
 
 function identify() {
 	echo Stage 1: Identify candidate files. 
-	time spatch -cocci_file identify.cocci -dir ${testdir} --no-loops
+	time spatch -cocci_file identify.cocci -D count=0 -dir ${testdir} --no-loops
 	time python copy_files.py
 	echo Result log: ${resultfile}.
 	echo Source files copied to: ${stage1_basic}
@@ -117,18 +128,18 @@ echo Start analyzing
 # call init() to prepare the working spaces
 
 #init
-
+#================================================================
 # identify candidate files from thousands of Linux sources files, 
 # based on principle of two reads from same src location 
+
 #identify
-
-
-echo ==================================================
+#================================================================
 # switch 34 wrapper functions to read_wrapper() block_read_wrapper() write_wrapper block_write_wrapper()
 echo Stage 2: switch wrapper functions.
 
-switch_wrapper 
-
+#switch_wrapper 
+python record_convert.py
+#================================================================
 # prune false positives
 echo Stage 3: prune false postives
 

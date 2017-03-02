@@ -1,3 +1,7 @@
+//define global variable
+@initialize:python@
+count << virtual.count;
+@@
 
 @identify@
 expression dst1,dst2,src,buf,value,count;
@@ -105,16 +109,17 @@ p12 << identify.p2;
 @@
 
 import json
-def print_and_log(filename,first,second):
+def print_and_log(filename,first,second,count):
 	
 	record = {}
-	record['fileName'] = filename
-	record['first'] = first
-	record['second'] = second
+	record['origin_file'] = filename
+	record['1_fetch'] = first
+	record['2_fetch'] = second
+	record['No.'] = count
 	print "record", record
 
 	data = json.dumps(record)
-	logfile = open('result.txt','a')
+	logfile = open('record1.txt','a')
 	logfile.write(data + "\n")
 	logfile.close()
 
@@ -123,6 +128,11 @@ if p11 and p12:
 	#coccilib.report.print_report(p11[0],"identify First fetch")
 	#coccilib.report.print_report(p12[0],"identify Second fetch")
 
-	print_and_log(p11[0].file, p11[0].line, p12[0].line)
+	if count:
+		count = str(int(count) + 1)
+	else:
+		count = "1"
+
+	print_and_log(p11[0].file, p11[0].line, p12[0].line, count)
 
 
