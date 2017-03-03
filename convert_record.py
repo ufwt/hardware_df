@@ -4,7 +4,7 @@ import json
 class Tool:
 	def __init__(self):
 		self.old_result = open("record1.txt","r")
-		self.new_result = open("record2.txt","a")
+		self.new_result = open("record2.txt","w")
 		self.buffer = ""
 		self.curfile = "" # the file being processed
 		self.main_record={} # To construct a large dict to hold all the record together,
@@ -17,7 +17,7 @@ class Tool:
 	def get_curfile(self, origin, num): # get the file name of the switched one
 		p = origin.rfind('/')
 		filename = origin[p+1:]
-		return 'stage2_switch/'+'switched-'+str(num)+'---'+filename
+		return 'switched-'+str(num)+'---'+filename
 
 	def main(self):
 		while True:

@@ -120,7 +120,8 @@ function identify() {
 }
 
 function prune() {
-	echo prune
+	echo Stage 3: prune false postives
+	time spatch -cocci_file prune.cocci -dir ${outdir2} --no-loops
 
 }
 #======================================== main procedure=========
@@ -138,11 +139,10 @@ echo Start analyzing
 echo Stage 2: switch wrapper functions.
 
 #switch_wrapper 
-python record_convert.py
+#python convert_record.py
 #================================================================
 # prune false positives
-echo Stage 3: prune false postives
 
-#prune
+prune
 
 echo finish
