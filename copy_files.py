@@ -2,6 +2,12 @@ import os
 import os.path
 import shutil
 import json
+
+
+
+
+
+# a tool used to copy files from source to stage1_identify/
 class Tool:
 	def __init__(self ):
 		if not os.path.exists("stage1_identify/"):
@@ -14,7 +20,7 @@ class Tool:
 
 		self.buffer = ""
 
-		#self.counter = 0
+		self.counter = 0
 
 	def get_dst(self, src, num):
 		p = src.rfind('/')
@@ -37,7 +43,7 @@ class Tool:
 				num = data['No.']
 				if src != self.buffer: #skip copying the same file
 					self.buffer = src
-					#self.counter = self.counter + 1
+					self.counter = self.counter + 1
 					dst = self.get_dst(src, num)
 					print "Copying from: ", src, "\tto: ", dst
 					shutil.copy(src,dst) 
@@ -51,3 +57,5 @@ class Tool:
 mytool = Tool()
 mytool.main()
 mytool.finish()
+
+

@@ -18,11 +18,11 @@ position p1;
 p << prune1.p1;
 @@
 
-import remove_record
+import record_handler
 if p:
 	#print 'Prune: ', p[0].file, ' unused read wrapper line: ', p[0].line
 
-	remove_record.delete(p[0].file, p[0].line)
+	record_handler.delete(p[0].file, p[0].line)
 
 @prune2@
 expression src;
@@ -35,8 +35,8 @@ position p1;
 p << prune2.p1;
 @@
 
-import remove_record
+import record_handler
 if p:
 	#print 'Prune: ', p[0].file, ' write(read) line: ', p[0].line
 
-	remove_record.delete(p[0].file, p[0].line)
+	record_handler.delete(p[0].file, p[0].line)

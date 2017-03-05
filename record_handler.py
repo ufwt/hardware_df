@@ -2,6 +2,21 @@ import json
 import sys
 import os
 
+def print_and_log(filename,first,second,count):
+	
+	record = {}
+	record['origin_file'] = filename
+	record['1_fetch'] = first
+	record['2_fetch'] = second
+	record['No.'] = count
+	print "record", record
+
+	data = json.dumps(record)
+	logfile = open('record1.txt','a')
+	logfile.write(data + "\n")
+	logfile.close()
+
+
 def delete(fullfile, line):
 	record_file = open("record2.txt","r")
 	record_str = record_file.readline()
@@ -21,10 +36,16 @@ def delete(fullfile, line):
 		while( i >= 0): # check from rear to front, because the deletion could change the list length
 			#print 'pair: ', record_dict[key]['fetch_list'][i] 
 			if record_dict[key]['fetch_list'][i][0] == str(line) or record_dict[key]['fetch_list'][i][1] == str(line):
+				
+				rm_file = open("rm_records.txt","a")
+				rm_file.write(key+': '+ str(record_dict[key]['fetch_list'][i]) + '\n')
+				rm_file.close()
+
+				item_deleted = 1
+
 				print 'delete pair: ', record_dict[key]['fetch_list'][i], 'in file: ', key
 				del record_dict[key]['fetch_list'][i]
-				
-				item_deleted = 1
+
 
 			i = i - 1
 		'''	
@@ -54,5 +75,5 @@ def delete(fullfile, line):
 		print 'Cannot not find key: ', key, 'line: ', line
 		return
 
-delete('switched-371---jmb38x_ms.c',659)
-delete('switched-8---axs10x.c',91)
+#delete('switched-371---jmb38x_ms.c',659)
+#delete('switched-8---axs10x.c',91)

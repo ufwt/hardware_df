@@ -104,7 +104,7 @@ function switch_wrapper() {
 	do 
 		num=$[num+1]
 		echo [${num}] Switching: ${curfile}
-		spatch --sp-file ${rootdir}/switch.cocci --no-loops  ${full_workdir}/${curfile}  -o ${full_outdir}/switched-${curfile} 
+		spatch --sp-file ${rootdir}/switch.cocci --no-loops  ${full_workdir}/${curfile}  -o ${full_outdir}/switched-${curfile} --no-loops --no-includes --include-headers --no-safe-expressions
 		#--no-show-diff
 	
 	done
@@ -113,7 +113,7 @@ function switch_wrapper() {
 
 function identify() {
 	echo Stage 1: Identify candidate files. 
-	time spatch -cocci_file identify.cocci -D count=0 -dir ${testdir} --no-loops
+	time spatch -cocci_file identify.cocci -D count=0 -dir ${testdir} --no-loops --no-includes  --include-headers --no-safe-expressions --steps 120
 	time python copy_files.py
 	echo Result log: ${resultfile}.
 	echo Source files copied to: ${stage1_basic}
@@ -121,7 +121,7 @@ function identify() {
 
 function prune() {
 	echo Stage 3: prune false postives
-	time spatch -cocci_file prune.cocci -dir ${outdir2} --no-loops
+	time spatch -cocci_file prune.cocci -dir ${outdir2} --no-loops --no-includes --include-headers --no-safe-expressions
 
 }
 #======================================== main procedure=========
@@ -138,11 +138,11 @@ echo Start analyzing
 # switch 34 wrapper functions to read_wrapper() block_read_wrapper() write_wrapper block_write_wrapper()
 echo Stage 2: switch wrapper functions.
 
-#switch_wrapper 
-#python convert_record.py
+switch_wrapper 
+python convert_record.py
 #================================================================
-# prune false positives
+prune false positives
 
-prune
+#prune
 
 echo finish
