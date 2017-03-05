@@ -1,5 +1,28 @@
 
 //---------------------
+
+@switch_special exists@
+expression exp,exp1,exp2,src;
+position p1;
+@@
+
+(
+-	memcpy_fromio(exp, &p->buf[(readl(exp1) + 3)& ~3],exp2) @p1
++	block_read_wrapper(exp,	&p->buf[(read_wrapper(exp1) + 3)& ~3], exp2)
+|
+-	readw(exp + 2*readw(src)) @p1
++	read_wrapper(exp + 2*read_wrapper(src))
+)
+
+@script:python@
+p11 << switch_special.p1;
+@@
+
+if p11 :
+	print "Embedded Read wrapper function switch at line:", p11[0].line
+
+
+
 @switch_read exists@
 expression dst,src,count,value;
 position p1;
@@ -64,7 +87,7 @@ p11 << switch_read.p1;
 @@
 
 if p11 :
-	print "Read wrapper function at line:", p11[0].line
+	print "Read wrapper function switch at line:", p11[0].line
 
 
 
@@ -133,7 +156,7 @@ p11 << switch_write.p1;
 @@
 
 if p11 :
-	print "Write wrapper function at line:", p11[0].line
+	print "Write wrapper function switch at line:", p11[0].line
 	
 
 
