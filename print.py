@@ -2,7 +2,7 @@
 import json
 
 def print_pretty():
-	record_file = open("record2.txt","r")
+	record_file = open("record_converted.txt","r")
 	record_str = record_file.readline()
 	record_dict = json.loads(record_str)
 	record_file.close()# load and close

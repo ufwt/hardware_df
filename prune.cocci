@@ -22,7 +22,7 @@ position p1;
 p << prune1.p1;
 @@
 
-import record_handler
+import tool
 if p:
 	#print 'Prune: ', p[0].file, ' unused read wrapper line: ', p[0].line
 	if count:
@@ -30,7 +30,7 @@ if p:
 	else:
 		count = "1"
 	print '==>Prune: [',count,']', p[0].file,' unused read wrapper line: ', p[0].line
-	record_handler.delete(p[0].file, p[0].line)
+	tool.delete(p[0].file, p[0].line)
 
 
 
@@ -46,7 +46,7 @@ position p1;
 p << prune2.p1;
 @@
 
-import record_handler
+import tool
 if p:
 	#print 'Prune: ', p[0].file, ' write(read) line: ', p[0].line
 	if count:
@@ -55,7 +55,7 @@ if p:
 		count = "1"
 	print '==>Prune: [',count,']', p[0].file, ' write(read) line: ', p[0].line 
 
-	record_handler.delete(p[0].file, p[0].line)
+	tool.delete(p[0].file, p[0].line)
 
 
 

@@ -2,45 +2,50 @@
 
 #=========================================Initialization
 rootdir=$(pwd)
-resultfile1='record1.txt'
-resultfile2='record2.txt'
+
 testdir='testdir'
-outdir1='stage1_identify'
-outdir2='stage2_switch'
-outdir3='stage3_prune'
+outdir_iden='stage1_identified'
+outdir_swit='stage2_switched'
+outdir_refn='stage3_refined'
+
+resultfile_iden='record_identified.txt'
+resultfile_refn='record_refined.txt'
+resultfile_conv='record_converted.txt'
+rm_records='record_removed.txt'
+
 
 
 function init(){
 	echo prepare workspace.
-	if test -d ${outdir1}
+	if test -d ${outdir_iden}
 	then 
-		rm -rf ${outdir1}/
-		mkdir ${outdir1}
-		echo Remove old stage1_identify files.
+		rm -rf ${outdir_iden}/
+		mkdir ${outdir_iden}
+		echo Remove old stage1_identified files.
 	else
-		mkdir ${outdir1}
-		echo Make stage1_identify dir.
+		mkdir ${outdir_iden}
+		echo Make stage1_identified dir.
 	fi
 
 
-	if test -d ${outdir2}
+	if test -d ${outdir_swit}
 	then 
-		rm -rf ${outdir2}/
-		mkdir ${outdir2}
-		echo Remove old stage2_switch files.
+		rm -rf ${outdir_swit}/
+		mkdir ${outdir_swit}
+		echo Remove old stage2_switched files.
 	else
-		mkdir ${outdir2}
-		echo Make stage2_switch dir.
+		mkdir ${outdir_swit}
+		echo Make stage2_switched dir.
 	fi
 
-	if test -d ${outdir3}
+	if test -d ${outdir_refn}
 	then 
-		rm -rf ${outdir3}/
-		mkdir ${outdir3}
-		echo Remove old stage3_prune files.
+		rm -rf ${outdir_refn}/
+		mkdir ${outdir_refn}
+		echo Remove old stage3_refined files.
 	else
-		mkdir ${outdir3}
-		echo Make stage3_prune dir.
+		mkdir ${outdir_refn}
+		echo Make stage3_refined dir.
 	fi
 
 
@@ -50,55 +55,63 @@ function init(){
 		echo Make  testdir.
 	fi
 
-	if test -f ${resultfile1}
+	if test -f ${resultfile_iden}
 	then 
-		rm ${resultfile1}
-		touch ${resultfile1}
-		echo Remove old results...
+		rm ${resultfile_iden}
+		touch ${resultfile_iden}
+		echo Remove old record_indentified.txt...
 	else
-		touch ${resultfile1}
-		echo Make results log file...
+		touch ${resultfile_iden}
+		echo Make record_indentified.txt...
 	fi
 
-	if test -f ${resultfile2}
+	if test -f ${resultfile_refn}
 	then 
-		rm ${resultfile2}
-		touch ${resultfile2}
-		echo Remove old results...
+		rm ${resultfile_refn}
+		touch ${resultfile_refn}
+		echo Remove old record_refined.txt...
 	else
-		touch ${resultfile2}
-		echo Make results log file...
+		touch ${resultfile_refn}
+		echo Make record_refined.txt...
+	fi
+
+	if test -f ${resultfile_conv}
+	then 
+		rm ${resultfile_conv}
+		touch ${resultfile_conv}
+		echo Remove old record_converted.txt...
+	else
+		touch ${resultfile_conv}
+		echo Make record_converted.txt...
+	fi
+
+	if test -f ${rm_records}
+	then 
+		rm ${rm_records}
+		touch ${rm_records}
+		echo Remove old record_removed.txt...
+	else
+		touch ${rm_records}
+		echo Make record_removed.txt...
 	fi
 }
 
+# Identify candidate files from thousands of Linux sources files, 
+# based on principle of two reads from same src location 
+# Later processing will works on these candidate files
+function identify() {
+	time spatch -cocci_file identify.cocci -D count=0 -dir ${testdir} --no-loops --no-includes  --include-headers --no-safe-expressions --steps 120
+	python copy_identified_files.py
+	echo Result log: ${resultfile_iden}.
+	echo Source files copied to: ${outdir_iden}
+}
+
+# Switch 34 wrapper functions to read_wrapper(), block_read_wrapper(), 
+# and write_wrapper(), block_write_wrapper() to reduce the possible combinations
 function switch_wrapper() {
 
-#	local cur_dir workdir  
-#	workdir=$1
-#	cd ${workdir}
-#    if  ${workdir} = "/" 
-#    then
-#        cur_dir=""
-#    else
-#        cur_dir=$(pwd)
-#    fi
-
-#    for curfile in $(ls ${cur_dir})
-#	do
-#		if test -d ${curfile}
-#        then
-#            cd ${curfile}
-#            switch_wrapper ${cur_dir}/${curfile} 
-#            cd ..
-#        else	 
-#			num=$[num+1]
-#			echo [${num}] Switching: ${curfile}
-#			spatch --sp-file ${rootdir}/switch.cocci  ${cur_dir}/${curfile}  -o ${full_outdir1}/switched-${curfile}
-#		fi
-#	done
-	full_workdir=${rootdir}/${outdir1}
-
-	full_outdir=${rootdir}/${outdir2}
+	full_workdir=${rootdir}/${outdir_iden}
+	full_outdir=${rootdir}/${outdir_swit}
 
 	for curfile in $(ls ${full_workdir})
 	do 
@@ -109,39 +122,45 @@ function switch_wrapper() {
 
 }
 
-function identify() {
-	echo Stage 1: Identify candidate files. 
-	time spatch -cocci_file identify.cocci -D count=0 -dir ${testdir} --no-loops --no-includes  --include-headers --no-safe-expressions --steps 120
-	time python copy_files.py
-	echo Result log: ${resultfile}.
-	echo Source files copied to: ${stage1_basic}
+# Since some line number changed during switching the wrapper functions
+# We need to rerun the pattern matching to generate new records, at the same time adding more refined rules. 
+# In the end of this step, we also convert the records log into a python dic for later processing
+function refine() {
+	time spatch --sp-file refine.cocci -D count=0 -dir ${outdir_swit} --no-loops --no-includes  --include-headers --no-safe-expressions --steps 120
+	python copy_refined_files.py
+	echo Result log: ${resultfile_refn}.
+	echo Source files copied to: ${outdir_refn}
+
+	python convert_record.py
+	echo Records log converted to ${resultfile_conv}.
 }
 
 function prune() {
-	echo Stage 3: prune false postives
-	time spatch -cocci_file prune.cocci -D count=0 -dir ${outdir2} --no-loops --no-includes --include-headers --no-safe-expressions
+	time spatch -cocci_file prune.cocci -D count=0 -dir ${outdir_refn} --no-loops --no-includes --include-headers --no-safe-expressions
 
 }
+
+
+
+
 #======================================== main procedure=========
-echo Start analyzing
-# call init() to prepare the working spaces
+echo Initialization: prepare the working spaces
+init
 
-#init
 #================================================================
-# identify candidate files from thousands of Linux sources files, 
-# based on principle of two reads from same src location 
+echo Stage 1: Identify candidate files.
+identify
 
-#identify
 #================================================================
-# switch 34 wrapper functions to read_wrapper() block_read_wrapper() write_wrapper block_write_wrapper()
-echo Stage 2: switch wrapper functions.
+echo Stage 2: Switch wrapper functions.
+switch_wrapper 
 
-#switch_wrapper 
-#python convert_record.py
+echo Stage 3: Refined pattern matching. 
+refine
+
 #================================================================
-echo prune false positives
-
-#prune
+echo Stage 4: Prune  positives
+prune
+python print.py
 
 echo finish
-python print.py

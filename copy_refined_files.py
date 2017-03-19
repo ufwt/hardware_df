@@ -5,18 +5,16 @@ import json
 
 
 
-
-
 # a tool used to copy files from source to stage1_identify/
 class Tool:
 	def __init__(self ):
-		if not os.path.exists("stage1_identify/"):
-			os.mkdir('stage1_identify/')
+		if not os.path.exists("stage3_refined/"):
+			os.mkdir('stage3_refined/')
 			#os.path.isfile('test.txt') 
 
-		self.result_handler = open("record1.txt","r")
+		self.result_handler = open("record_refined.txt","r")
 		if not self.result_handler:
-			print "open result failed!"
+			print "open record_refined.txt failed!"
 
 		self.buffer = ""
 
@@ -25,7 +23,7 @@ class Tool:
 	def get_dst(self, src, num):
 		p = src.rfind('/')
 		filename = src[p+1:]
-		return 'stage1_identify/'+str(num)+'---'+filename #add 'num' in the file name to distinguish files with same name in the same dir
+		return 'stage3_refined/'+'refined---'+filename #add 'num' in the file name to distinguish files with same name in the same dir
 
 		
 	def main(self):

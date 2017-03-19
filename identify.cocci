@@ -107,7 +107,7 @@ p11 << identify1.p1;
 p12 << identify1.p2;
 @@
 
-import record_handler
+import tool
 if p11 and p12:
 	print "[identify1][1st]: ",p11[0].line
 	print "[identify1][2nd]: ",p12[0].line
@@ -119,7 +119,7 @@ if p11 and p12:
 	else:
 		count = "1"
 
-	record_handler.print_and_log(p11[0].file, p11[0].line, p12[0].line, count)
+	tool.record_identified_files(p11[0].file, p11[0].line, p12[0].line, count)
 
 
 
@@ -270,7 +270,7 @@ p11 << identify2.p1;
 p12 << identify2.p2;
 @@
 
-import record_handler
+import tool
 if p11 and p12:
 	print "[identify2][1st]: ",p11[0].line
 	print "[identify2][2nd]: ",p12[0].line
@@ -280,7 +280,7 @@ if p11 and p12:
 	else:
 		count = "1"
 
-	record_handler.print_and_log(p11[0].file, p11[0].line, p12[0].line, count)
+	tool.record_identified_files(p11[0].file, p11[0].line, p12[0].line, count)
 
 
 
@@ -416,7 +416,7 @@ p11 << identify3.p1;
 p12 << identify3.p2;
 @@
 
-import record_handler
+import tool
 if p11 and p12:
 	print "[identify3][1st]: ",p11[0].line
 	print "[identify3][2nd]: ",p12[0].line
@@ -426,7 +426,7 @@ if p11 and p12:
 	else:
 		count = "1"
 
-	record_handler.print_and_log(p11[0].file, p11[0].line, p12[0].line, count)
+	tool.record_identified_files(p11[0].file, p11[0].line, p12[0].line, count)
 
 
 
@@ -560,7 +560,7 @@ p11 << identify4.p1;
 p12 << identify4.p2;
 @@
 
-import record_handler
+import tool
 if p11 and p12:
 	print "[identify3][1st]: ",p11[0].line
 	print "[identify3][2nd]: ",p12[0].line
@@ -570,5 +570,5 @@ if p11 and p12:
 	else:
 		count = "1"
 
-	record_handler.print_and_log(p11[0].file, p11[0].line, p12[0].line, count)
+	tool.record_identified_files(p11[0].file, p11[0].line, p12[0].line, count)
 
