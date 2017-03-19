@@ -104,9 +104,7 @@ function switch_wrapper() {
 	do 
 		num=$[num+1]
 		echo [${num}] Switching: ${curfile}
-		spatch --sp-file ${rootdir}/switch.cocci --no-loops  ${full_workdir}/${curfile}  -o ${full_outdir}/switched-${curfile} --no-loops --no-includes --include-headers --no-safe-expressions
-		#--no-show-diff
-	
+		spatch --sp-file ${rootdir}/switch.cocci --no-loops  ${full_workdir}/${curfile}  -o ${full_outdir}/switched-${curfile} --no-show-diff --no-loops --no-includes --include-headers --no-safe-expressions	
 	done
 
 }
@@ -121,7 +119,7 @@ function identify() {
 
 function prune() {
 	echo Stage 3: prune false postives
-	time spatch -cocci_file prune.cocci -dir ${outdir2} --no-loops --no-includes --include-headers --no-safe-expressions
+	time spatch -cocci_file prune.cocci -D count=0 -dir ${outdir2} --no-loops --no-includes --include-headers --no-safe-expressions
 
 }
 #======================================== main procedure=========
@@ -138,11 +136,12 @@ echo Start analyzing
 # switch 34 wrapper functions to read_wrapper() block_read_wrapper() write_wrapper block_write_wrapper()
 echo Stage 2: switch wrapper functions.
 
-switch_wrapper 
-python convert_record.py
+#switch_wrapper 
+#python convert_record.py
 #================================================================
-prune false positives
+echo prune false positives
 
 #prune
 
 echo finish
+python print.py

@@ -1,3 +1,7 @@
+@initialize:python@
+count << virtual.count;
+@@
+
 @prune1@
 expression src;
 statement S;
@@ -21,8 +25,15 @@ p << prune1.p1;
 import record_handler
 if p:
 	#print 'Prune: ', p[0].file, ' unused read wrapper line: ', p[0].line
-
+	if count:
+		count = str(int(count) + 1)
+	else:
+		count = "1"
+	print '==>Prune: [',count,']', p[0].file,' unused read wrapper line: ', p[0].line
 	record_handler.delete(p[0].file, p[0].line)
+
+
+
 
 @prune2@
 expression src;
@@ -38,5 +49,23 @@ p << prune2.p1;
 import record_handler
 if p:
 	#print 'Prune: ', p[0].file, ' write(read) line: ', p[0].line
+	if count:
+		count = str(int(count) + 1)
+	else:
+		count = "1"
+	print '==>Prune: [',count,']', p[0].file, ' write(read) line: ', p[0].line 
 
 	record_handler.delete(p[0].file, p[0].line)
+
+
+
+
+
+
+
+
+
+
+
+
+

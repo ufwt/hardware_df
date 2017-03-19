@@ -43,10 +43,12 @@ def delete(fullfile, line):
 
 				item_deleted = 1
 
-				print 'delete pair: ', record_dict[key]['fetch_list'][i], 'in file: ', key
+				print 'Delete pair: ', record_dict[key]['fetch_list'][i], 'in file: ', key, 'for line: ', str(line)
 				del record_dict[key]['fetch_list'][i]
-
-
+			else:
+				#print 'Line (',str(line),') not in the pair',str(record_dict[key]['fetch_list'][i]), 'skip' 
+				pass
+				
 			i = i - 1
 		'''	
 		for (x,y) in fl: #check fl, but delete from record_dict.[key]['fetch_list']
@@ -72,8 +74,34 @@ def delete(fullfile, line):
 			
 
 	else:
-		print 'Cannot not find key: ', key, 'line: ', line
+		print 'Cannot find key: ', key, 'line: ', line, 'perhaps file has been deleted, skip.'
 		return
 
 #delete('switched-371---jmb38x_ms.c',659)
 #delete('switched-8---axs10x.c',91)
+
+# print the final result in a way easy for manual review
+def print_pretty():
+	record_file = open("record2.txt","r")
+	record_str = record_file.readline()
+	record_dict = json.loads(record_str)
+	record_file.close()# load and close
+
+	count = 0
+
+	for f in record_dict:
+		print record_dict[f]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
