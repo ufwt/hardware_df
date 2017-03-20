@@ -40,7 +40,7 @@ expression src;
 position p1;
 @@
 
-	write_wrapper(<+...read_wrapper(src)...+>,src) @p1
+	write_wrapper(<+...read_wrapper(src)@p1...+>,src) 
 
 @script:python@
 p << prune2.p1;

@@ -10,9 +10,9 @@ position p1,p2;
 
 
 (
-	read_wrapper(src) @p1
+	read_wrapper(src)@p1 
 |
-	block_read_wrapper(dst,src,count) @p1
+	block_read_wrapper(dst,src,count)@p1
 )
 
 	 ... when any
@@ -25,9 +25,9 @@ position p1,p2;
 		when != src --
 
 (
-	read_wrapper(src) @p2
+	read_wrapper(src)@p2
 |
-	block_read_wrapper(dst2,src,count2) @p2
+	block_read_wrapper(dst2,src,count2)@p2
 )
 
 
