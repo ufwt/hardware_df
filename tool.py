@@ -31,8 +31,8 @@ def record_refined_files(filename,first,second,count):
 	logfile.write(data + "\n")
 	logfile.close()
 
-
-def delete(fullfile, line):
+# Any fetch pair that involve this line should be removed. 
+def delete_one_fetch_line(fullfile, line):
 	record_file = open("record_converted.txt","r")
 	record_str = record_file.readline()
 	record_dict = json.loads(record_str)
@@ -92,6 +92,63 @@ def delete(fullfile, line):
 		print 'Cannot find key: ', key, 'line: ', line, ', perhaps because file has been deleted, skip.'
 		return
 
+# Any fetch pair matches these two line should be removed.
+def delete_two_fetch_lines(fullfile, line1, line2):
+	record_file = open("record_converted.txt","r")
+	record_str = record_file.readline()
+	record_dict = json.loads(record_str)
+	record_file.close()# load and close
+
+	p = fullfile.rfind('/')
+	key = fullfile[p+1:] # get the file name, used as the key of dict
+	#print record_dict
+
+	if record_dict.has_key(key):
+
+		#print 'list=',record_dict[key]['fetch_list']
+		item_deleted = 0
+		
+		i = len(record_dict[key]['fetch_list']) -1
+		while( i >= 0): # check from rear to front, because the deletion could change the list length
+			#print 'pair: ', record_dict[key]['fetch_list'][i] 
+			if record_dict[key]['fetch_list'][i][0] == str(line1) and record_dict[key]['fetch_list'][i][1] == str(line2):
+				
+				rm_file = open("record_removed.txt","a")
+				rm_file.write(key+': '+ str(record_dict[key]['fetch_list'][i]) + '\n')
+				rm_file.close()
+
+				item_deleted = 1
+
+				print 'Delete pair: ', record_dict[key]['fetch_list'][i], 'in file: ', key
+				del record_dict[key]['fetch_list'][i]
+			else:
+				#print 'Line pair(',str(line1),',',str(line2),') not in the list',str(record_dict[key]['fetch_list'][i]), 'skip' 
+				pass
+
+			i = i - 1
+	
+		
+		if item_deleted == 1: # when a fetch pair is deleted, we check whether the list if empty
+			
+			if(len(record_dict[key]['fetch_list']) == 0):	# if empty, the file should be removed.
+				rmfile = 'stage3_refined/'+key
+				os.remove(rmfile)
+				print 'Remove file: ', rmfile
+				del record_dict[key]
+
+			new_record_str = json.dumps(record_dict)
+			record_file = open("record_converted.txt","w")
+			record_file.write(new_record_str) # rewrite the new record back to the file
+			record_file.close()
+
+			
+
+	else:
+		print 'Cannot find key: ', key, 'line pair: ', line1,',',line2,' perhaps because file has been deleted, skip.'
+		return
+
+
+# test
 #delete('switched-371---jmb38x_ms.c',659)
 #delete('switched-8---axs10x.c',91)
 

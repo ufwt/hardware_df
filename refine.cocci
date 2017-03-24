@@ -4,7 +4,7 @@ count << virtual.count;
 @@
 
 @identify1 @
-expression dst1,dst2,src,buf,value,count1,count2,count,offset,addr;
+expression dst1,dst2,src,buf,value,count1,count2,count,offset,addr,arg,s1,s2;
 position p1,p2;
 @@
 
@@ -12,16 +12,21 @@ position p1,p2;
 (
 	read_wrapper(src)@p1 
 |
-	block_read_wrapper(dst,src,count)@p1
+	block_read_wrapper(dst1,src,count1)@p1
 )
 
 	 ... when any
 		when != write_wrapper(value,src)
+		when != write_wrapper(value,(src))
+		when != SPECIAL_REG_WRITE(value,src,arg)
 		when != block_write_wrapper(src,buf,count)
+		when != iproc_pll_write(arg,s1,s2,value)
 		when != src = src + offset
+		when != src += offset
 		when != src ++
 		when != src = addr
 		when != src = src - offset
+		when != src -= offset
 		when != src --
 
 (
@@ -70,9 +75,11 @@ type T;
 		when != write_wrapper(value,src)
 		when != block_write_wrapper(src,buf,count)
 		when != src = src + offset
+		when != src += offset
 		when != src ++
 		when != src = addr
 		when != src = src - offset
+		when != src -= offset
 		when != src --
 ( 
 	ptr = src
@@ -81,9 +88,11 @@ type T;
 )
 	 ... when any
 	 	when != ptr = ptr + offset
+	 	when != ptr += offset
 		when != ptr ++
 		when != ptr = addr
 		when != ptr = ptr - offset
+		when != ptr -= offset
 		when != ptr --
 
 		when != write_wrapper(value,ptr)
@@ -145,6 +154,7 @@ type T;
 
 	 ... when any
 	 	when != ptr = ptr + offset
+	 	when != ptr += offset
 		when != ptr ++
 		when != ptr = addr
 		when != ptr = ptr - offset
@@ -200,14 +210,16 @@ type T;
 (
 	read_wrapper(ptr)@p1
 |
-	block_read_wrapper(dst2,ptr,count1)@p1
+	block_read_wrapper(dst1,ptr,count1)@p1
 )
 
 	 ... when any
 	 	when != src = src + offset
+	 	when != src += offset
 		when != src ++
 		when != src = addr
 		when != src = src - offset
+		when != src -= offset
 		when != src --
 
 	 	when != write_wrapper(value,ptr)
@@ -219,7 +231,7 @@ type T;
 (
 	read_wrapper(src)@p2
 |
-	block_read_wrapper(dst1,src,count2)@p2
+	block_read_wrapper(dst2,src,count2)@p2
 )
 
 
@@ -230,8 +242,8 @@ p12 << identify4.p2;
 
 import tool
 if p11 and p12:
-	print "[refine3][1st]: ",p11[0].line
-	print "[refine3][2nd]: ",p12[0].line
+	print "[refine4][1st]: ",p11[0].line
+	print "[refine4][2nd]: ",p12[0].line
 
 	if count:
 		count = str(int(count) + 1)

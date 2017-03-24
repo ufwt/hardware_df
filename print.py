@@ -11,7 +11,7 @@ def print_pretty():
 
 	for name in record_dict:
 		for fetches in record_dict[name]['fetch_list']:
-			print '[', count, '] file: ', name, 'fetches: ',fetches	
+			print '[', count, '] file: ', name,fetches	
 			count = count + 1
 
 
