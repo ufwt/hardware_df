@@ -66,111 +66,107 @@ if p:
 
 
 
-@prune3@
-expression src,dst,count;
-position p1;
-@@
+//@prune3@
+//expression src,dst,count;
+//position p1;
+//@@
 
-	while(...){
-		...
-(
-		read_wrapper(src)@p1
-|
-		block_read_wrapper(dst,src,count)@p1
-)
-		...
-	}
+//	while(...){
+//		...
+//(
+//		read_wrapper(src)@p1
+//|
+//		block_read_wrapper(dst,src,count)@p1
+//)
+//		...
+//	}
 
-@script:python@
-p << prune3.p1;
-@@
+//@script:python@
+//p << prune3.p1;
+//@@
 
-import tool
-if p:
+//import tool
+//if p:
 
-	if count:
-		count = str(int(count) + 1)
-	else:
-		count = "1"
-	print '==>Prune: [',count,']', p[0].file, ' while{read()}: ', p[0].line 
+//	if count:
+//		count = str(int(count) + 1)
+//	else:
+//		count = "1"
+//	print '==>Prune: [',count,']', p[0].file, ' while{read()}: ', p[0].line 
+//
+//	tool.delete_one_fetch_line(p[0].file, p[0].line)
 
-	tool.delete_one_fetch_line(p[0].file, p[0].line)
 
+//@prune4@
+//expression src;
+//position p1;
+//statement S;
+//@@
 
-@prune4@
-expression src;
-position p1;
-statement S;
-@@
+//(
+//	while(<+...read_wrapper(src)@p1...+>)
+//		S
+//|
+//	while(<+...read_wrapper(src)@p1...+>)
+//	{...}
+//)
 
-(
-	while(<+...read_wrapper(src)@p1...+>)
-		S
-|
-	while(<+...read_wrapper(src)@p1...+>)
-	{...}
-)
+//@script:python@
+//p << prune4.p1;
+//@@
 
-@script:python@
-p << prune4.p1;
-@@
-
-import tool
-if p:
+//import tool
+//if p:
 	
-	if count:
-		count = str(int(count) + 1)
-	else:
-		count = "1"
-	print '==>Prune: [',count,']', p[0].file, ' while(read()){...}: ', p[0].line 
+//	if count:
+//		count = str(int(count) + 1)
+//	else:
+//		count = "1"
+//	print '==>Prune: [',count,']', p[0].file, ' while(read()){...}: ', p[0].line 
 
-	tool.delete_one_fetch_line(p[0].file, p[0].line)
-
-
+//	tool.delete_one_fetch_line(p[0].file, p[0].line)
 
 
+//@prune5@
+//expression src;
+//position p1,p2;
+//statement S;
+//@@
+
+//(
+//	if(<+...read_wrapper(src)@p1...+>)
+//		S
+//|
+//	if(<+...read_wrapper(src)@p1...+>){
+//		...
+//	}
+//)
+//	... when any
+//(
+//	if(<+...read_wrapper(src)@p2...+>)
+//		S
+//|
+//	if(<+...read_wrapper(src)@p2...+>){
+//		...
+//	}
+//)
 
 
-@prune5@
-expression src;
-position p1,p2;
-statement S;
-@@
+//@script:python@
+//p1 << prune5.p1;
+//p2 << prune5.p2;
+//@@
 
-(
-	if(<+...read_wrapper(src)@p1...+>)
-		S
-|
-	if(<+...read_wrapper(src)@p1...+>){
-		...
-	}
-)
-	... when any
-(
-	if(<+...read_wrapper(src)@p2...+>)
-		S
-|
-	if(<+...read_wrapper(src)@p2...+>){
-		...
-	}
-)
-
-
-@script:python@
-p1 << prune5.p1;
-p2 << prune5.p2;
-@@
-
-import tool
-if p1 and p2:
+//import tool
+//if p1 and p2:
 	
-	if count:
-		count = str(int(count) + 1)
-	else:
-		count = "1"
-	print '==>Prune: [',count,']', p1[0].file, ' if...if (', p1[0].line,',',p2[0].line,')' 
+//	if count:
+//		count = str(int(count) + 1)
+//	else:
+//		count = "1"
+//	print '==>Prune: [',count,']', p1[0].file, ' if...if (', p1[0].line,',',p2[0].line,')' 
 
-	tool.delete_two_fetch_lines(p1[0].file, p1[0].line, p1[0].line)
+//	tool.delete_two_fetch_lines(p1[0].file, p1[0].line, p1[0].line)
 
 
 # Any fetch involves a display function should be abandoned,

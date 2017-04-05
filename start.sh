@@ -145,15 +145,15 @@ function prune() {
 
 #======================================== main procedure=========
 echo Initialization: prepare the working spaces
-#init
+init
 
 #================================================================
 echo Stage 1: Identify candidate files.
-#identify
+identify
 
 #================================================================
 echo Stage 2: Switch wrapper functions.
-#switch_wrapper 
+switch_wrapper 
 
 echo Stage 3: Refined pattern matching. 
 refine
