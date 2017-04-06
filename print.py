@@ -26,13 +26,21 @@ def print_pretty():
 
 	count = 1
 	i = 0
+	temp=[0,0]
 	while i < list_length:
 		if l[i] == 0:
 			pass
 		else:
 			for fetches in l[i]['fetch_list']:
-				print '[', count, '] file: ', l[i]['origin_file'],fetches	
-				count = count + 1
+				if fetches[0] == temp[0] and fetches[1] == temp[1]: # don't print the duplicate reports
+					pass
+				else:
+					print '[', count, '] file: ', l[i]['origin_file'], fetches	
+					temp[0] = fetches[0]
+					temp[1] = fetches[1]
+					count = count + 1
 		i = i + 1
+		temp[0] = 0
+		temp[1] = 0
 
 print_pretty()
