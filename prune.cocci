@@ -66,108 +66,131 @@ if p:
 
 
 
-//@prune3@
-//expression src,dst,count;
-//position p1;
-//@@
-
-//	while(...){
-//		...
-//(
-//		read_wrapper(src)@p1
-//|
-//		block_read_wrapper(dst,src,count)@p1
-//)
-//		...
-//	}
-
-//@script:python@
-//p << prune3.p1;
-//@@
-
-//import tool
-//if p:
-
-//	if count:
-//		count = str(int(count) + 1)
-//	else:
-//		count = "1"
-//	print '==>Prune: [',count,']', p[0].file, ' while{read()}: ', p[0].line 
-//
-//	tool.delete_one_fetch_line(p[0].file, p[0].line)
+@prune3@
+expression src,o1,o2;
+position p1,p2;
+@@
 
 
-//@prune4@
-//expression src;
-//position p1;
-//statement S;
-//@@
+	read_wrapper(src)<<o1 @p1
+	... when any
+	read_wrapper(src)<<o2 @p2
 
-//(
-//	while(<+...read_wrapper(src)@p1...+>)
-//		S
-//|
-//	while(<+...read_wrapper(src)@p1...+>)
-//	{...}
-//)
 
-//@script:python@
-//p << prune4.p1;
-//@@
+@script:python@
+p1 << prune3.p1;
+p2 << prune3.p2;
+@@
 
-//import tool
-//if p:
+import tool
+if p1 and p2:
+
+	if count:
+		count = str(int(count) + 1)
+	else:
+		count = "1"
+	print '==>Prune: [',count,']', p1[0].file, 'Serial Read: read() << offset : [', p1[0].line,',', p2[0].line,']'
+
+	tool.delete_two_fetch_lines(p1[0].file, p1[0].line,p2[0].line)
+	tool.delete_one_fetch_line(p1[0].file, p1[0].line)
+	tool.delete_one_fetch_line(p2[0].file, p2[0].line)
+
+
+@prune4@
+expression src,r1,r2,mask;
+position p1,p2;
+identifier i1,i2;
+@@
+
+(
+	r1 = read_wrapper(src)@p1 ;
+	r2 = read_wrapper(src)@p2 ; 
+|
+	r1 = read_wrapper(src)@p1 ;
+	r2 = read_wrapper(src)@p2 & mask;
+|
+	u32 i1 = read_wrapper(src)@p1 & mask;
+	u32 i2 = read_wrapper(src)@p2 & mask;
+|
+	u32 i1 = read_wrapper(src)@p1;
+	u32 i2 = read_wrapper(src)@p2;
+|
+	uint16_t i1 = read_wrapper(src)@p1;
+	uint16_t i2 = read_wrapper(src)@p2;
+|
+	r1 = read_wrapper(src)@p1 & mask;
+	...
+	r2 = read_wrapper(src)@p2 & mask;
+)
+
+@script:python@
+p1 << prune4.p1;
+p2 << prune4.p2;
+@@
+
+import tool
+if p1 and p2:
 	
-//	if count:
-//		count = str(int(count) + 1)
-//	else:
-//		count = "1"
-//	print '==>Prune: [',count,']', p[0].file, ' while(read()){...}: ', p[0].line 
+	if count:
+		count = str(int(count) + 1)
+	else:
+		count = "1"
+	print '==>Prune: [',count,']', p1[0].file, 'Serial Read: l=read(),h=read() : [', p1[0].line,',', p2[0].line,']'
 
-//	tool.delete_one_fetch_line(p[0].file, p[0].line)
-
-
-//@prune5@
-//expression src;
-//position p1,p2;
-//statement S;
-//@@
-
-//(
-//	if(<+...read_wrapper(src)@p1...+>)
-//		S
-//|
-//	if(<+...read_wrapper(src)@p1...+>){
-//		...
-//	}
-//)
-//	... when any
-//(
-//	if(<+...read_wrapper(src)@p2...+>)
-//		S
-//|
-//	if(<+...read_wrapper(src)@p2...+>){
-//		...
-//	}
-//)
+	tool.delete_two_fetch_lines(p1[0].file, p1[0].line,p2[0].line)
+	tool.delete_one_fetch_line(p1[0].file, p1[0].line) #remove constant matches, cannot use when any here
+	tool.delete_one_fetch_line(p2[0].file, p2[0].line)
 
 
-//@script:python@
-//p1 << prune5.p1;
-//p2 << prune5.p2;
-//@@
+@prune5@
+expression src,temp,r1,mask,offset;
+position p1,p2;
+@@
 
-//import tool
-//if p1 and p2:
+(
+	r1 |= read_wrapper(src)@p1 << offset;
+	r1 |= read_wrapper(src)@p2 & mask;
+|
+	r1 = read_wrapper(src)@p1 & mask;
+	r1 |= read_wrapper(src)@p2 << offset;
+|
+	r1 = read_wrapper(src)@p1 << offset;
+	r1 |= read_wrapper(src)@p2;
+|
+	r1 = read_wrapper(src)@p1;
+	r1 |= read_wrapper(src)@p2  << offset;
+|
+	r1 = (u32) read_wrapper(src)@p1;
+	...
+	r1 |= ((u32)read_wrapper(src)@p2 ) << offset;
+|
+	temp = read_wrapper(src)@p1;
+	r1 |= temp << offset;
+	temp = read_wrapper(src)@p2;
+|
+	r1 = read_wrapper(src)@p1;
+	r1 <<= offset;
+	...
+	r1 |= read_wrapper(src)@p2;
+)
+
+@script:python@
+p1 << prune5.p1;
+p2 << prune5.p2;
+@@
+
+import tool
+if p1 and p2:
 	
-//	if count:
-//		count = str(int(count) + 1)
-//	else:
-//		count = "1"
-//	print '==>Prune: [',count,']', p1[0].file, ' if...if (', p1[0].line,',',p2[0].line,')' 
+	if count:
+		count = str(int(count) + 1)
+	else:
+		count = "1"
+	print '==>Prune: [',count,']', p1[0].file, 'Serial Read:read()>>, read()&, [', p1[0].line,',',p2[0].line,']' 
 
-//	tool.delete_two_fetch_lines(p1[0].file, p1[0].line, p1[0].line)
-
+	tool.delete_two_fetch_lines(p1[0].file, p1[0].line, p1[0].line)
+	tool.delete_one_fetch_line(p1[0].file, p1[0].line) #remove constant matches, cannot use when any here
+	tool.delete_one_fetch_line(p2[0].file, p2[0].line)
 
 # Any fetch involves a display function should be abandoned,
 # because it will not cause any security related problem
@@ -483,4 +506,65 @@ if p1 and p2:
 
 	tool.delete_two_fetch_lines(p1[0].file, p1[0].line, p1[0].line)
 
+# Remove the fetches that the fetched value is used for print
+@prune8@
+expression src,e0,e1,e2,e3,e4,e5,e6;
+position p1,p2;
+identifier value;
+@@
 
+
+(
+	uint16_t value  = read_wrapper(src)@p1;
+|
+	value  = read_wrapper(src)@p1;
+)
+	... when any
+
+(
+	pr_debug(e0,e1,value,e2,e3)@p2;
+|
+	pr_debug(e0,e1,e2,value,e3)@p2;
+|
+	pr_debug(e0,e1,e2,e3,value)@p2;
+|
+	dev_dbg(e0,e1,value,e2,e3)@p2;
+|
+	dev_dbg(e0,e1,e2,value,e3)@p2;
+|
+	dev_dbg(e0,e1,e2,e3,value)@p2;
+|
+	printk(e0,e1,e2,e3,value,e4)@p2;
+|
+	printk(e0,e1,e2,e3,e4,value)@p2;
+|
+	dev_warn(e0,e1,value,e2,e3)@p2;
+|
+	dev_warn(e0,e1,e2,value,e3)@p2;
+|
+	dev_warn(e0,e1,e2,e3,value)@p2;
+|
+	dev_dbg(e0,e1,e2,value,e3,e4)@p2;
+|
+	dev_dbg(e0,e1,e2,e3,value,e4)@p2;
+|
+	dev_dbg(e0,e1,e2,e3,e4,value)@p2;
+)
+		
+
+
+
+@script:python@
+p << prune8.p1;
+@@
+
+import tool
+if p:
+	
+	if count:
+		count = str(int(count) + 1)
+	else:
+		count = "1"
+	print '==>Prune: [',count,']', p[0].file, ' fetch for display: ', p[0].line 
+
+	tool.delete_one_fetch_line(p[0].file, p[0].line)
