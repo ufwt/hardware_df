@@ -136,7 +136,7 @@ function refine() {
 }
 
 function prune() {
-	time spatch -cocci_file prune.cocci -D count=0 -dir ${outdir_refn} --no-loops --no-includes --include-headers --no-safe-expressions
+	time spatch -cocci_file prune.cocci -D count=0 -D debug=0 -dir ${outdir_refn} --no-loops --no-includes --include-headers --no-safe-expressions
 
 }
 

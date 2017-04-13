@@ -18,6 +18,7 @@ position p1,p2;
 	 ... when any
 		when != write_wrapper(value,src)
 		when != write_wrapper(value,(src))
+		when != writel_relaxed(value,src)
 		when != SPECIAL_REG_WRITE(value,src,arg)
 		when != block_write_wrapper(src,buf,count)
 		when != iproc_pll_write(arg,s1,s2,value)
